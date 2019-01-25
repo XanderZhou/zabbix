@@ -1,0 +1,810 @@
+--------------------------------------------------------------------------
+-- Copyright (c) 2013 All rights reserved
+--
+-- EMC Corporation
+-- Hopkinton, MA 01748 USA 
+--
+-- This software is furnished under a license and may be used and copied
+-- inclusion of the above copyright notice. This software or any other
+-- only in accordance with the terms of such license and with the
+-- copies thereof may not be provided or otherwise made available to any
+-- other person. No title to and ownership of the software is hereby
+-- transferred.
+--
+-- The information in this software is subject to change without notice
+-- and should not be construed as a commitment by EMC Corporation.
+--
+-- EMC Corporation assumes no responsibility for the use or reliability
+-- of this software.
+--
+--------------------------------------------------------------------------
+--
+-- VPLEX Custom MIB
+--
+--------------------------------------------------------------------------
+-- 
+-- EMC Technical Contact(s):
+--
+-- sumeet.malhotra@emc.com, dale.hagglund@emc.com
+--------------------------------------------------------------------------
+
+
+VPLEX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Counter64,
+	Gauge32,
+	IpAddress,
+	Unsigned32
+		FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC;
+
+
+vplex   MODULE-IDENTITY
+	    LAST-UPDATED "201309180900Z"	-- Sep 18, 2013 09:00:00 AM
+	    ORGANIZATION "EMC Corporation"
+	    CONTACT-INFO
+		    "EMC Corporation
+		    176 South Street
+		    Hopkinton, MA 01748 USA
+		    Phone: 1-800-424-EMC2 
+		    Web  : www.emc.com
+		    email: support@emc.com"
+	    DESCRIPTION
+		    "EMC VPLEX MIB Tree."
+	    REVISION "201309180900Z"	    -- Sep 18, 2013 09:00:00 AM
+	    DESCRIPTION
+		    "2nd version."
+	    -- 1.3.6.1.4.1.1139.21
+	    ::= { enterprises 1139 21 }
+
+
+vplexStats OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.1139.21.2
+	::= { vplex 2 }
+
+-- Reserved.
+vplexCluster OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.1139.21.2.1
+	::= { vplexStats 1 }
+
+-- VPLEX director statistics.
+vplexDirectors OBJECT IDENTIFIER 
+	-- 1.3.6.1.4.1.1139.21.2.2
+	::= { vplexStats 2 }
+
+vplexDirectorTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF VplexDirectorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Details about a particular VPLEX director."
+	-- 1.3.6.1.4.1.1139.21.2.2.1
+	::= { vplexDirectors 1 }
+
+
+vplexDirectorEntry OBJECT-TYPE
+	SYNTAX  VplexDirectorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Details about a particular VPLEX director."
+	INDEX {
+		vplexDirectorPrimaryIpAddr }
+	-- 1.3.6.1.4.1.1139.21.2.2.1.1
+	::= { vplexDirectorTable 1 }
+
+
+VplexDirectorEntry ::= SEQUENCE {
+
+	vplexDirectorPrimaryIpAddr  IpAddress,
+	vplexDirectorFailoverIpAddr IpAddress,
+	vplexDirectorName           DisplayString }
+
+
+vplexDirectorPrimaryIpAddr OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Primary IP Address of the director."
+	-- 1.3.6.1.4.1.1139.21.2.2.1.1.1
+	::= { vplexDirectorEntry 1 }
+
+
+vplexDirectorFailoverIpAddr OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Failover IP Address of this director."
+	-- 1.3.6.1.4.1.1139.21.2.2.1.1.2
+	::= { vplexDirectorEntry 2 }
+
+
+vplexDirectorName OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The name of this director."
+	-- 1.3.6.1.4.1.1139.21.2.2.1.1.3
+	::= { vplexDirectorEntry 3 }
+
+
+vplexDirectorMemTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF VplexDirectorMemTableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Memory statistics for a director. Augments vplexDirectorTable."
+	-- 1.3.6.1.4.1.1139.21.2.2.2
+	::= { vplexDirectors 2 }
+
+
+vplexDirectorMemTableEntry OBJECT-TYPE
+	SYNTAX  VplexDirectorMemTableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Memory statistics for a director."
+	AUGMENTS {
+		vplexDirectorEntry }
+	-- 1.3.6.1.4.1.1139.21.2.2.2.1
+	::= { vplexDirectorMemTable 1 }
+
+
+VplexDirectorMemTableEntry ::= SEQUENCE {
+
+	vplexDirectorHeapUsed Integer32 }
+
+
+vplexDirectorHeapUsed OBJECT-TYPE
+	SYNTAX  Integer32 (0..100)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Director Heap utilization percentage."
+	-- 1.3.6.1.4.1.1139.21.2.2.2.1.1
+	::= { vplexDirectorMemTableEntry 1 }
+
+
+vplexDirectorProcTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF VplexDirectorProcTableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Processor statistics for a director. Augments vplexDirectorTable."
+	-- 1.3.6.1.4.1.1139.21.2.2.3
+	::= { vplexDirectors 3 }
+
+
+vplexDirectorProcTableEntry OBJECT-TYPE
+	SYNTAX  VplexDirectorProcTableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Processor statistics for a director."
+	AUGMENTS {
+		vplexDirectorEntry }
+	-- 1.3.6.1.4.1.1139.21.2.2.3.1
+	::= { vplexDirectorProcTable 1 }
+
+
+VplexDirectorProcTableEntry ::= SEQUENCE {
+
+	vplexDirectorCpuIdle Integer32 }
+
+
+vplexDirectorCpuIdle OBJECT-TYPE
+	SYNTAX  Integer32 (0..100)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"CPU idle percentage."
+	-- 1.3.6.1.4.1.1139.21.2.2.3.1.1
+	::= { vplexDirectorProcTableEntry 1 }
+
+
+vplexDirectorFETable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF VplexDirectorFETableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Aggregated VPLEX front end port statistics for a director. Augments vplexDirectorTable."
+	-- 1.3.6.1.4.1.1139.21.2.2.4
+	::= { vplexDirectors 4 }
+
+
+vplexDirectorFETableEntry OBJECT-TYPE
+	SYNTAX  VplexDirectorFETableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Aggregated VPLEX front end port statistics for a director."
+	AUGMENTS {
+		vplexDirectorEntry }
+	-- 1.3.6.1.4.1.1139.21.2.2.4.1
+	::= { vplexDirectorFETable 1 }
+
+
+VplexDirectorFETableEntry ::= SEQUENCE {
+
+	vplexDirectorFEOpsRead            Counter64,
+	vplexDirectorFEOpsWrite           Counter64,
+	vplexDirectorFEOpsQueued          Counter64,
+	vplexDirectorFEOpsActive          Counter64,
+	vplexDirectorFEOpsAvgReadLatency  Gauge32,
+	vplexDirectorFEOpsAvgWriteLatency Gauge32,
+	vplexDirectorFEBytesRead          Counter64,
+	vplexDirectorFEBytesWrite         Counter64 }
+
+
+vplexDirectorFEOpsRead OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of read operations through director's FE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.4.1.1
+	::= { vplexDirectorFETableEntry 1 }
+
+
+vplexDirectorFEOpsWrite OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations through director's FE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.4.1.2
+	::= { vplexDirectorFETableEntry 2 }
+
+
+vplexDirectorFEOpsQueued OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations queued on director's FE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.4.1.3
+	::= { vplexDirectorFETableEntry 3 }
+
+
+vplexDirectorFEOpsActive OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations active on director's FE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.4.1.4
+	::= { vplexDirectorFETableEntry 4 }
+
+
+vplexDirectorFEOpsAvgReadLatency OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Average read latency (usec) on director's FE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.4.1.5
+	::= { vplexDirectorFETableEntry 5 }
+
+
+vplexDirectorFEOpsAvgWriteLatency OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Average write latency (usec) on director's FE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.4.1.6
+	::= { vplexDirectorFETableEntry 6 }
+
+
+vplexDirectorFEBytesRead OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes read on the director's FE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.4.1.7
+	::= { vplexDirectorFETableEntry 7 }
+
+
+vplexDirectorFEBytesWrite OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes written on the director's FE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.4.1.8
+	::= { vplexDirectorFETableEntry 8 }
+
+
+vplexDirectorFEPortTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF VplexDirectorFEPortEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A list of all front end ports in the VPLEX director and related statistics."
+	-- 1.3.6.1.4.1.1139.21.2.2.5
+	::= { vplexDirectors 5 }
+
+
+vplexDirectorFEPortEntry OBJECT-TYPE
+	SYNTAX  VplexDirectorFEPortEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Contains the information for a specific front end port."
+	INDEX {
+        vplexDirectorPrimaryIpAddr,
+		vplexDirectorFEPortIndex }
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1
+	::= { vplexDirectorFEPortTable 1 }
+
+
+VplexDirectorFEPortEntry ::= SEQUENCE {
+
+	vplexDirectorFEPortIndex              Unsigned32,
+	vplexDirectorFEPortName               DisplayString,
+	vplexDirectorFEPortOpsRead            Counter64,
+	vplexDirectorFEPortOpsWrite           Counter64,
+	vplexDirectorFEPortOpsQueued          Counter64,
+	vplexDirectorFEPortOpsActive          Counter64,
+	vplexDirectorFEPortOpsAvgReadLatency  Gauge32,
+	vplexDirectorFEPortOpsAvgWriteLatency Gauge32,
+	vplexDirectorFEPortBytesRead          Counter64,
+	vplexDirectorFEPortBytesWrite         Counter64 }
+
+
+vplexDirectorFEPortIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique index value for this FE Port."
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1.1
+	::= { vplexDirectorFEPortEntry 1 }
+
+
+vplexDirectorFEPortName OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Name of this FE Port."
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1.2
+	::= { vplexDirectorFEPortEntry 2 }
+
+
+vplexDirectorFEPortOpsRead OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Number of read operations through this FE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1.3
+	::= { vplexDirectorFEPortEntry 3 }
+
+
+vplexDirectorFEPortOpsWrite OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations through this FE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1.4
+	::= { vplexDirectorFEPortEntry 4 }
+
+
+vplexDirectorFEPortOpsQueued OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations queued on this FE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1.5
+	::= { vplexDirectorFEPortEntry 5 }
+
+
+vplexDirectorFEPortOpsActive OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations active on this FE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1.6
+	::= { vplexDirectorFEPortEntry 6 }
+
+
+vplexDirectorFEPortOpsAvgReadLatency OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Average latency (usec) for read operations on this FE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1.7
+	::= { vplexDirectorFEPortEntry 7 }
+
+
+vplexDirectorFEPortOpsAvgWriteLatency OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Average latency (usec) for write operations on this FE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1.8
+	::= { vplexDirectorFEPortEntry 8 }
+
+
+vplexDirectorFEPortBytesRead OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes read on this FE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1.9
+	::= { vplexDirectorFEPortEntry 9 }
+
+
+vplexDirectorFEPortBytesWrite OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes written on this FE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.5.1.10
+	::= { vplexDirectorFEPortEntry 10 }
+
+
+vplexDirectorBETable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF VplexDirectorBETableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Aggregated backend port statistics for a director. Augments vplexDirectorTable."
+	-- 1.3.6.1.4.1.1139.21.2.2.6
+	::= { vplexDirectors 6 }
+
+
+vplexDirectorBETableEntry OBJECT-TYPE
+	SYNTAX  VplexDirectorBETableEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Aggregated backend port statistics for a director."
+	AUGMENTS {
+		vplexDirectorEntry }
+	-- 1.3.6.1.4.1.1139.21.2.2.6.1
+	::= { vplexDirectorBETable 1 }
+
+
+VplexDirectorBETableEntry ::= SEQUENCE {
+
+	vplexDirectorBEOpsRead            Counter64,
+	vplexDirectorBEOpsWrite           Counter64,
+	vplexDirectorBEOpsQueued          Counter64,
+	vplexDirectorBEOpsActive          Counter64,
+	vplexDirectorBEOpsAvgReadLatency  Gauge32,
+	vplexDirectorBEOpsAvgWriteLatency Gauge32,
+	vplexDirectorBEBytesRead          Counter64,
+	vplexDirectorBEBytesWrite         Counter64 }
+
+
+vplexDirectorBEOpsRead OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of read operations through director's BE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.6.1.1
+	::= { vplexDirectorBETableEntry 1 }
+
+
+vplexDirectorBEOpsWrite OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations through director's BE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.6.1.2
+	::= { vplexDirectorBETableEntry 2 }
+
+
+vplexDirectorBEOpsQueued OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations queued on director's BE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.6.1.3
+	::= { vplexDirectorBETableEntry 3 }
+
+
+vplexDirectorBEOpsActive OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations active on director's BE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.6.1.4
+	::= { vplexDirectorBETableEntry 4 }
+
+
+vplexDirectorBEOpsAvgReadLatency OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Average read latency (usec) on director's BE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.6.1.5
+	::= { vplexDirectorBETableEntry 5 }
+
+
+vplexDirectorBEOpsAvgWriteLatency OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Average write latency (usec) on director's BE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.6.1.6
+	::= { vplexDirectorBETableEntry 6 }
+
+
+vplexDirectorBEBytesRead OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes read on the director's BE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.6.1.7
+	::= { vplexDirectorBETableEntry 7 }
+
+
+vplexDirectorBEBytesWrite OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes written on the director's BE ports."
+	-- 1.3.6.1.4.1.1139.21.2.2.6.1.8
+	::= { vplexDirectorBETableEntry 8 }
+
+
+vplexDirectorBEPortTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF VplexDirectorBEPortEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"A table of VPLEX BE ports and related statistics."
+	-- 1.3.6.1.4.1.1139.21.2.2.7
+	::= { vplexDirectors 7 }
+
+
+vplexDirectorBEPortEntry OBJECT-TYPE
+	SYNTAX  VplexDirectorBEPortEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Contains the information for a specific port."
+	INDEX {
+        vplexDirectorPrimaryIpAddr,
+		vplexDirectorBEPortIndex }
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1
+	::= { vplexDirectorBEPortTable 1 }
+
+
+VplexDirectorBEPortEntry ::= SEQUENCE {
+
+	vplexDirectorBEPortIndex              Unsigned32,
+	vplexDirectorBEPortName               DisplayString,
+	vplexDirectorBEPortOpsRead            Counter64,
+	vplexDirectorBEPortOpsWrite           Counter64,
+	vplexDirectorBEPortOpsQueued          Counter64,
+	vplexDirectorBEPortOpsActive          Counter64,
+	vplexDirectorBEPortOpsAvgReadLatency  Gauge32,
+	vplexDirectorBEPortOpsAvgWriteLatency Gauge32,
+	vplexDirectorBEPortBytesRead          Counter64,
+	vplexDirectorBEPortBytesWrite         Counter64 }
+
+
+vplexDirectorBEPortIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique index value for this BE Port."
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1.1
+	::= { vplexDirectorBEPortEntry 1 }
+
+
+vplexDirectorBEPortName OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Name of this BE Port."
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1.2
+	::= { vplexDirectorBEPortEntry 2 }
+
+
+vplexDirectorBEPortOpsRead OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Number of read operations through this BE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1.3
+	::= { vplexDirectorBEPortEntry 3 }
+
+
+vplexDirectorBEPortOpsWrite OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations through this BE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1.4
+	::= { vplexDirectorBEPortEntry 4 }
+
+
+vplexDirectorBEPortOpsQueued OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations queued on this BE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1.5
+	::= { vplexDirectorBEPortEntry 5 }
+
+
+vplexDirectorBEPortOpsActive OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Number of write operations active on this BE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1.6
+	::= { vplexDirectorBEPortEntry 6 }
+
+
+vplexDirectorBEPortOpsAvgReadLatency OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Average latency (usec) for read operations on this BE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1.7
+	::= { vplexDirectorBEPortEntry 7 }
+
+
+vplexDirectorBEPortOpsAvgWriteLatency OBJECT-TYPE
+	SYNTAX  Gauge32
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Average latency (usec) for write operations on this BE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1.8
+	::= { vplexDirectorBEPortEntry 8 }
+
+
+vplexDirectorBEPortBytesRead OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes read on this BE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1.9
+	::= { vplexDirectorBEPortEntry 9 }
+
+
+vplexDirectorBEPortBytesWrite OBJECT-TYPE
+	SYNTAX  Counter64
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of bytes written on this BE port."
+	-- 1.3.6.1.4.1.1139.21.2.2.7.1.10
+	::= { vplexDirectorBEPortEntry 10 }
+
+-- virtual volume information and statistics:
+
+vplexDirectorVirtualVolumeTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF VplexDirectorVirtualVolumeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A list of all virtual volumes in the VPLEX director and related statistics."
+	-- 1.3.6.1.4.1.1139.21.2.2.8
+	::= { vplexDirectors 8 }
+
+vplexDirectorVirtualVolumeEntry OBJECT-TYPE
+	SYNTAX VplexDirectorVirtualVolumeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Contains the information for a specific virtual volume."
+	INDEX {
+        vplexDirectorPrimaryIpAddr,
+        vplexDirectorVirtualVolumeName }
+	-- 1.3.6.1.4.1.1139.21.2.2.8.1
+	::= { vplexDirectorVirtualVolumeTable 1 }
+
+VplexDirectorVirtualVolumeEntry ::= SEQUENCE {
+	vplexDirectorVirtualVolumeName              DisplayString,
+	vplexDirectorVirtualVolumeUuid              DisplayString,
+	vplexDirectorVirtualVolumeOps               Counter64,
+	vplexDirectorVirtualVolumeRead              Counter64,
+	vplexDirectorVirtualVolumeWrite             Counter64,
+	vplexDirectorVirtualVolumeReadAvgLatency    Gauge32,
+	vplexDirectorVirtualVolumeWriteAvgLatency   Gauge32,
+}
+
+vplexDirectorVirtualVolumeName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Unique human-readable name of this virtual volume."
+	-- 1.3.6.1.4.1.1139.21.2.2.8.1.1
+	::= { vplexDirectorVirtualVolumeEntry 1 }
+
+vplexDirectorVirtualVolumeUuid OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"UUID (Unique Universal Identifier) of this virtual volume."
+	-- 1.3.6.1.4.1.1139.21.2.2.8.1.2
+	::= { vplexDirectorVirtualVolumeEntry 2 }
+
+vplexDirectorVirtualVolumeOps OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Number of all I/O operations through this virtual volume."
+	-- 1.3.6.1.4.1.1139.21.2.2.8.1.3
+	::= { vplexDirectorVirtualVolumeEntry 3 }
+
+vplexDirectorVirtualVolumeRead OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Number of bytes read from this virtual volume."
+	-- 1.3.6.1.4.1.1139.21.2.2.8.1.4
+	::= { vplexDirectorVirtualVolumeEntry 4 }
+
+vplexDirectorVirtualVolumeWrite OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Number of bytes written to this virtual volume."
+	-- 1.3.6.1.4.1.1139.21.2.2.8.1.5
+	::= { vplexDirectorVirtualVolumeEntry 5 }
+
+vplexDirectorVirtualVolumeReadAvgLatency OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Average latency (usec) for read operations for this virtual volume."
+	-- 1.3.6.1.4.1.1139.21.2.2.8.1.6
+	::= { vplexDirectorVirtualVolumeEntry 6 }
+
+vplexDirectorVirtualVolumeWriteAvgLatency OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Average latency (usec) for write operations for this virtual volume."
+	-- 1.3.6.1.4.1.1139.21.2.2.8.1.7
+	::= { vplexDirectorVirtualVolumeEntry 7 }
+
+END
