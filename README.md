@@ -28,3 +28,5 @@
         notifications call-home test will generate a test trap
 ### Change SNMP Community
 ### Done!
+
+中文用户可能参考本人订阅号上的说明：https://mp.weixin.qq.com/s?__biz=MzUwOTc0MjQzMQ==&mid=2247483794&idx=1&sn=575bd4ffc8974c22cff00527836230fa&chksm=f90cdda2ce7b54b40dec9b1972ce4b783818611cf84447800a52c12f60b16973a927ed0fc192&token=569269806&lang=zh_CN#rd
