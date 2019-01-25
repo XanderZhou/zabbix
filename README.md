@@ -1,5 +1,5 @@
-# zabbix
-## About Vplex Template
+# zabbix tempates
+## Vplex Template
 ### configuration in Vplex
   * For PULLing info from VPLEX (snmp GET, not necessary for traps):
 
