@@ -26,4 +26,4 @@
         set started true
 
         notifications call-home test will generate a test trap
-###
+### Change SNMP Community
